@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2020-11-14T02:08:11.872Z</updated>
+  <updated>2020-11-14T08:39:11.948Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>post for practice</title>
+    <link href="http://example.com/2020/11/14/post-for-practice/"/>
+    <id>http://example.com/2020/11/14/post-for-practice/</id>
+    <published>2020-11-14T08:37:45.000Z</published>
+    <updated>2020-11-14T08:39:11.948Z</updated>
+    
+    <content type="html"><![CDATA[<h1><span id="diary">Diary</span></h1><blockquote><p>今日の一言<br>今日はゆいと喧嘩して、キムチチゲ会をドタキャンしてしまった、、<br>反省しないと、、、</p></blockquote><p>これから頑張りましょう！！</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1&gt;&lt;span id=&quot;diary&quot;&gt;Diary&lt;/span&gt;&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;今日の一言&lt;br&gt;今日はゆいと喧嘩して、キムチチゲ会をドタキャンしてしまった、、&lt;br&gt;反省しないと、、、&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;これから頑張りましょう</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>About-This-Blog</title>
