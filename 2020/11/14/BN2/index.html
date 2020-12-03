@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="naver-site-verification" content="6e24a11cf15ee701f05bfe07ff086c5730400e73"><meta><title>【 도대체 베이지안 네트워크가 뭐야? ②】 - Jay Sung&#039;s DS blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Jay Sung&#039;s DS blog"><meta name="msapplication-TileImage" content="https://i.imgur.com/ijBb95M.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Jay Sung&#039;s DS blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta description><meta property="og:type" content="blog"><meta property="og:title" content="【 도대체 베이지안 네트워크가 뭐야? ②】"><meta property="og:url" content="https://jaysung00.github.io/2020/11/14/BN2/"><meta property="og:site_name" content="Jay Sung&#039;s DS blog"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://i.imgur.com/8FGRRsH.png"><meta property="article:published_time" content="2020-11-14T14:15:12.000Z"><meta property="article:modified_time" content="2020-12-03T08:14:56.598Z"><meta property="article:author" content="Jay Sung"><meta property="article:tag" content="causal"><meta property="article:tag" content="KMOOC"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://i.imgur.com/8FGRRsH.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://jaysung00.github.io/2020/11/14/BN2/"},"headline":"Jay Sung's DS blog","image":["https://i.imgur.com/8FGRRsH.png"],"datePublished":"2020-11-14T14:15:12.000Z","dateModified":"2020-12-03T08:14:56.598Z","author":{"@type":"Person","name":"Jay Sung"},"description":""}</script><link rel="canonical" href="https://jaysung00.github.io/2020/11/14/BN2/"><link rel="icon" href="https://i.imgur.com/ijBb95M.png"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-182943513-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-182943513-1');</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/rss2.xml" title="Jay Sung's DS blog" type="application/rss+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/About-this-blog/">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/jaysung00"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-10-widescreen"><div class="card"><div class="card-image"><span class="image is-7by3"><img class="fill" src="https://i.imgur.com/8FGRRsH.png" alt="【 도대체 베이지안 네트워크가 뭐야? ②】"></span></div><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time datetime="2020-11-14T14:15:12.000Z" title="2020-11-14T14:15:12.000Z">2020-11-14</time></span><span class="level-item">Updated&nbsp;<time datetime="2020-12-03T08:14:56.598Z" title="2020-12-03T08:14:56.598Z">2020-12-03</time></span><span class="level-item"><a class="link-muted" href="/categories/KOR/">KOR</a><span> / </span><a class="link-muted" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a><span> / </span><a class="link-muted" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></span></div></div><h1 class="title is-3 is-size-4-mobile">【 도대체 베이지안 네트워크가 뭐야? ②】</h1><div class="content"><hr>
+<a id="more"></a>
+<h1><span id="factorization-of-bayes-network">* Factorization of Bayes Network</span></h1>
+<hr>
+<ul>
+<li><p>그래프에 속한 RV의 결합분포(joint distribution)는 <code>family</code>의 모든 조건부 분포 <span class="math inline">\(P(Child|Parent)\)</span>의 곱으로 표현 할 수 있다.</p></li>
+<li><p><span class="math inline">\(P(X_1,X_2,...,X_n) = \prod _iP(X_i|Parents(X_i))\)</span></p></li>
+<li><p><code>곱 분해 법칙 (Rule of product decomposition)</code></p></li>
+<li><p>확률의 연쇄법칙 <span class="math inline">\(P(a,b,c,...,z) = P(a|b,c,...,z)P(b,c,....,z)\)</span>에서 사슬과 분기의 Rule에 따르면 부모노드가 given이면 이상은 조상노드는 전부 독립이게 되므로 성립. (충돌부는 부모노드가 아니다.)</p></li>
+<li><p>즉, Bayes Network의 정보를 통해 joint distribution를 계산할 때 parameter의 갯수를 줄일 수 있다.</p></li>
+</ul>
+<p><br></p>
+<p><span class="math inline">\([ 예시 ]\)</span><br>
+<img src="https://i.imgur.com/tl4t2Iz.png" width="350px"></p>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(P(X_1,X_2,X_3,X_4,X_5,X_6,X_7,X_8)\)</span>를 구한다고 하자.</li>
+</ul>
+<ol type="1">
+<li><p><strong>확률의 연쇄법칙 (Chain Rule for probability)</strong> 에 의해 아무런 Bayesian Network의 정보가 없다고 하더라도 <span class="math inline">\(P(X_1,X_2,X_3,...,X_8) = P(X_1|X_2,X_3,...,X_8)P(X_2|X_3,...,X_8)P(X_3|X_4,...,X_8)...P(X_8)\)</span> 로 Factorize 할 수 있다.</p></li>
+<li><p><strong>곱 분해 법칙 (Rule of product decomposition)</strong> 에 의해 Bayesian Network의 정보를 활용하면 <span class="math inline">\(P(X_1,X_2,X_3,...,X_8) = P(X_1)P(X_2)P(X_3|X_1)P(X_4|X_2)P(X_5|X_2)P(X_6|X_3,X_4)P(X_7|X_6)P(X_8|X_5,X_6)\)</span> 로 훨씬 작은 parameter만으로 Factorize 가능하다.</p></li>
+</ol>
+<p><br></p>
+<hr>
+<h1><span id="plate-notation">* Plate Notation</span></h1>
+<hr>
+<blockquote>
+<p><span class="math inline">\(\begin{align} P(D|\theta) &amp;= P(X_1,...,X_N|\mu,\sigma) \\ &amp;= \prod_i^N P(X_i|\mu,\sigma) \end{align}\)</span></p>
+</blockquote>
+<p><img src="https://i.imgur.com/QqfT9En.png" width="700px"></p>
+<ul>
+<li>이처럼 여러 개의 독립적인 RV들에 대해 위와 같이 <strong>Plate Notation</strong> 로 표현하는 것이 가능하다.</li>
+</ul>
+<p><br></p>
+<hr>
+<h1><span id="베이지안-네트워크에서의-확률추론">* 베이지안 네트워크에서의 확률추론</span></h1>
+<hr>
+<ul>
+<li><p>BN에 있는 모든 random variables ;<br>
+<span class="math inline">\(X = \{X1 ... X_N\}\)</span></p></li>
+<li><p>주어진 증거 변수 (given evidence variables) ;<br>
+<span class="math inline">\(X_V =\{X_{k+1}...X_N\}\)</span><br>
+<span class="math inline">\(x_V\)</span>는 evidence values</p></li>
+<li><p>명시적으로 다루지는 않지만 관계가 있어서 감안할 필요가 있는 변수 (hidden variables) ;<br>
+<span class="math inline">\(X_H = X-X_V = \{X_1...X_k\}\)</span></p></li>
+<li><p>hidden variables ; <span class="math inline">\(X_H = \{Y,Z\}\)</span></p>
+<ul>
+<li><span class="math inline">\(Y\)</span> : query variable (interested hidden variables)<br>
+</li>
+<li><span class="math inline">\(Z\)</span> : uninterested hidden variables</li>
+</ul></li>
+</ul>
+<p><br></p>
+<h3><span id="1-1-주변확률-marginal-probability">1-1 주변확률 (Marginal Probability)</span></h3>
+<blockquote>
+<p>증거 변수 <span class="math inline">\(X_V\)</span> 의 <strong>주변확률 (Marginal Probability)</strong> <span class="math inline">\(P(x_V)\)</span> 는?</p>
+</blockquote>
+<p>      <span class="math inline">\(\begin{align} P(x_V) &amp;=\sum_{X_H}P(X)=\sum_{X_H}P(X_H,X_V) \space\space\space\space\space\space\dots(1)\\ &amp;= \sum_{x_1}...\sum_{x_k}P(x_1...x_k,x_V)\space\space\space\space\space\space\space\space\space\dots(2) \end{align}\)</span></p>
+<ul>
+<li><p>(1). 모든 변수에 대해 <strong>full joint</strong> 된 것을 <span class="math inline">\(X_H\)</span>로 marginalize out한 것이라고 생각한다.</p></li>
+<li><p>(2). 각각의 Hidden variable에 대해 marginalize out한 것이라고 생각한다.</p></li>
+</ul>
+<p><br></p>
+<h3><span id="1-2-조건부-확률-conditional-probability">1-2. 조건부 확률 (Conditional Probability)</span></h3>
+<blockquote>
+<p>주어진 증거(evidence)의 집합<span class="math inline">\(x_V\)</span>이 있을때, <strong>query variable(주어지지 않았지만 관심있는 변수)</strong> 의 <strong>조건부 확률</strong> <span class="math inline">\(P(Y|x_V)\)</span>은?</p>
+</blockquote>
+<p>      <span class="math inline">\(\begin{align} P(Y|X_V) &amp;= \sum_ZP(Y,Z = z|x_V) \space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\dots(1)\\ &amp;= \sum_Z\cfrac{P(Y,Z,x_V)}{P(x_V)} = \sum_Z\alpha P(X) \space\space\space\space\space\space\space\space\space\space\dots(2)\\ &amp;= \sum_Z \cfrac{P(Y,Z,x_V)}{\sum_{y,z}P(Y=y, Z=z, x_V)}\space\space\space\space\space\space\space\space\space\dots(3) \end{align}\)</span><br>
+<br></p>
+<ul>
+<li><p>(1). <span class="math inline">\(Z\)</span>를 joint로 넣어주면서 <span class="math inline">\(Z\)</span>에 대해 marginalize out 한다.</p></li>
+<li><p>(2). 조건부 확률의 정의를 이용해, <span class="math inline">\(x_V\)</span>를 포함한 <strong>full joint</strong> 를 <span class="math inline">\(P(x_V)\)</span> (Marginal Probability)로 나눈다.<br>
+(<span class="math inline">\(\cfrac{1}{P(x_V)} = \alpha\)</span>라는 정규화 상수(normalization constant)의 곱으로 생각할수도 있다.)</p></li>
+<li><p>(3). 분모의 주변확률은 Inference Question1처럼 <strong>full joint</strong> 를 모든 Hidden variable에 대해 marginalize 해서 구할 수 있다.</p></li>
+</ul>
+<p><br></p>
+<hr>
+<h1><span id="변수제거-알고리즘-variable-eliminatation-algorithm">* 변수제거 알고리즘 (Variable Eliminatation Algorithm)</span></h1>
+<hr>
+<p><img src="https://i.imgur.com/suXGsdJ.png" width="750px"></p>
+<blockquote>
+<p>위와 같이 주어진 상황에서 변수제거 알고리즘으로 <span class="math inline">\(P(J=j)\)</span>를 구해보자</p>
+</blockquote>
+<h3><span id="step1">* Step1</span></h3>
+<ul>
+<li>위의 준비를 통해 베이지안 네트워크 상에서 관심있는 확률의 추론을 위해서, <strong>full joint</strong> 를 구하고 uninterested hidden variable에 대해 <strong>Marginalize</strong> 한다.</li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\sum_{A,E,B,M} P(J= j,A,E,B,M)\)</span></li>
+</ul>
+<p><br></p>
+<h3><span id="step2">* Step2</span></h3>
+<ul>
+<li><p><strong>full joint</strong> 를 Bayesina Network의 정보를 이용해 <em>곱분해 법칙</em>으로 바꿔 쓴다.</p></li>
+<li><p>분해한 곱의 나열순서는 <strong>topological order</strong> <span class="math inline">\(^{[*1]}\)</span> 를 따른다.</p></li>
+<li><p><strong>topological order</strong> ; B, E, A, J, M</p></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\sum_{B,E,A,M} P(B)P(E)P(A|B,E)P(J=j|A)P(M|A)\)</span></li>
+</ul>
+<p><br></p>
+<p>&lt;span style="font-size: 85%;&gt; <span class="math inline">\(^{[*1]}:\)</span> 들어오는 화살표가 없는 노드 부터 하나씩 선택하며 지우는 것을 반복할때 결정되는 순서 </p>
+<h3><span id="step3">* Step3</span></h3>
+<ul>
+<li><p>순서를 유지한 채 각 <span class="math inline">\(\sum\)</span>가 관련없는 것을 밖으로 빼낸다.</p></li>
+<li><p>제거할 변수의 순서는 뒤에서부터 정해진다.</p></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\space\space\space\sum_B P(B)\sum_EP(E)\sum_AP(A|B,E)P(J=j|A)\sum_MP(M|A)\)</span></li>
+</ul>
+<p><br></p>
+<h3><span id="step4">* Step4</span></h3>
+<ul>
+<li>뒤에서 부터 <strong>function notation</strong>으로 바꿔주면서 변수를 지워나간다.</li>
+</ul>
+<p><br></p>
+<ol type="1">
+<li><span class="math inline">\(\space\space\space\sum_B P(B)\sum_EP(E)\sum_AP(A|B,E)P(J=j|A) \underline {\sum_MP(M|A)}\)</span></li>
+</ol>
+<ul>
+<li><p><span class="math inline">\(=\sum_B P(B)\sum_EP(E)\sum_AP(A|B,E)P(J=j|A) \underline {\bf f_1(A)}\)</span></p>
+<ul>
+<li>밑줄친 부분은 J와 <span class="math inline">\(d\)</span>-seperate이기 때문에 고려할 필요가 없다. 즉, A의 값과 상관없이 <span class="math inline">\(f_1(A)\)</span>는 1을 갖는다.</li>
+</ul></li>
+</ul>
+<p><img src="https://i.imgur.com/EnN5hP3.png" width="220px"></p>
+<p><br></p>
+<ol start="2" type="1">
+<li><span class="math inline">\(=\sum_B P(B)\sum_EP(E)\underline{\sum_AP(A|B,E)P(J=j|A)}\)</span></li>
+</ol>
+<ul>
+<li><p><span class="math inline">\(=\sum_B P(B)\sum_EP(E)\underline {\bf f_2(E,B)}\)</span></p>
+<ul>
+<li><span class="math inline">\(f_2(E,B)\)</span>는 이하와 같다.</li>
+</ul></li>
+</ul>
+<p><img src="https://i.imgur.com/BOhvHDZ.png" width="750px"></p>
+<p><br></p>
+<ol start="3" type="1">
+<li><span class="math inline">\(=\sum_B P(B)\underline {\sum_EP(E)f_2(B,E)}\)</span></li>
+</ol>
+<ul>
+<li><p><span class="math inline">\(=\sum_B P(B) \underline {\bf f_3(B)}\)</span></p>
+<ul>
+<li><span class="math inline">\(f_3(B)\)</span>는 이하와 같다.</li>
+</ul></li>
+</ul>
+<p><img src="https://i.imgur.com/A3u5hM9.png" width="750px"></p>
+<p><br></p>
+<ol start="4" type="1">
+<li><span class="math inline">\(= \sum_BP(B)f_3(B)\)</span></li>
+</ol>
+<ul>
+<li><p><span class="math inline">\(= P(B=b)f_3(B=b) + P(B= \sim b)f_3(B=\sim b)\)</span></p></li>
+<li><p><span class="math inline">\(=0.001 * 0.849017 + 0.999 * 0.0513413 \fallingdotseq 0.052139\)</span></p></li>
+<li><p>따라서, <span class="math inline">\(P(J=j) = 0.052139\)</span> 가 된다.</p></li>
+</ul>
+<p><br></p>
+<hr>
+<h2><span id="reference">* Reference</span></h2>
+<p>해당 포스트는 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.edwith.org/machinelearning2__17/joinLectures/9782">Edwith에 개설된 문일철 교수님의 인공지능 및 기계학습 개론 II 강의</a>를 정리 &amp; 추가한 내용임을 밝힙니다.</p>
+<p>추가 내용 참조 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.youtube.com/watch?v=TZnEJ4wvLPY">https://www.youtube.com/watch?v=TZnEJ4wvLPY</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.kyobobook.co.kr/product/detailViewKor.laf?ejkGb=KOR&amp;mallGb=KOR&amp;barcode=9791125102236">의학 및 사회과학 연구를 위한 통계적 인과추론 （Judea Pearl, Madelyn Glymour, Nicholas P. Jewell）</a></p>
+</div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/causal/">causal</a><a class="link-muted mr-2" rel="tag" href="/tags/KMOOC/">KMOOC</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=5faeaef89fba030012a7dd31&amp;product=inline-share-buttons" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/jaysung00" target="_blank" rel="external nofollow noopener noreferrer" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2020/11/14/BN1/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">【 도대체 베이지안 네트워크가 뭐야? ①】</span></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script>var disqus_config = function () {
+            this.page.url = 'https://jaysung00.github.io/2020/11/14/BN2/';
+            this.page.identifier = '2020/11/14/BN2/';
+        };
+        (function() {
+            var d = document, s = d.createElement('script');  
+            s.src = '//' + 'jays-hexo-blog' + '.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();</script></div></div></div><!--!--><div class="column column-right is-4-tablet is-4-desktop is-4-widescreen  order-3 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">1</span><span class="level-item">* Factorization of Bayes Network</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2</span><span class="level-item">* Plate Notation</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3</span><span class="level-item">* 베이지안 네트워크에서의 확률추론</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3.1.1</span><span class="level-item">1-1 주변확률 (Marginal Probability)</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3.1.2</span><span class="level-item">1-2. 조건부 확률 (Conditional Probability)</span></span></a></li></ul></ul></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4</span><span class="level-item">* 변수제거 알고리즘 (Variable Eliminatation Algorithm)</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4.1.1</span><span class="level-item">* Step1</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4.1.2</span><span class="level-item">* Step2</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4.1.3</span><span class="level-item">* Step3</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4.1.4</span><span class="level-item">* Step4</span></span></a></li></ul><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">4.2</span><span class="level-item">* Reference</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><figure class="media-left"><a class="image" href="/2020/11/30/CI1/"><img src="https://i.imgur.com/hHuRkYo.jpg" alt="【Causal Inference 입문편 ①】인과추론의 목적과 RCT에 관하여"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-30T02:39:29.000Z">2020-11-30</time></p><p class="title"><a href="/2020/11/30/CI1/">【Causal Inference 입문편 ①】인과추론의 목적과 RCT에 관하여</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/11/14/BN1/"><img src="https://i.imgur.com/8FGRRsH.png" alt="【 도대체 베이지안 네트워크가 뭐야? ①】"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-14T14:15:12.000Z">2020-11-14</time></p><p class="title"><a href="/2020/11/14/BN1/">【 도대체 베이지안 네트워크가 뭐야? ①】</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/11/14/BN2/"><img src="https://i.imgur.com/8FGRRsH.png" alt="【 도대체 베이지안 네트워크가 뭐야? ②】"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-14T14:15:12.000Z">2020-11-14</time></p><p class="title"><a href="/2020/11/14/BN2/">【 도대체 베이지안 네트워크가 뭐야? ②】</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/KOR/"><span class="level-start"><span class="level-item">KOR</span></span><span class="level-end"><span class="level-item tag">3</span></span></a><ul><li><a class="level is-mobile" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/"><span class="level-start"><span class="level-item">통계적인과추론</span></span><span class="level-end"><span class="level-item tag">3</span></span></a><ul><li><a class="level is-mobile" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/"><span class="level-start"><span class="level-item">ML</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></li></ul></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a><p class="is-size-7"><span>&copy; 2020 Jay Sung</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="external nofollow noopener noreferrer">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'folded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>
