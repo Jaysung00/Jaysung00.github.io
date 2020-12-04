@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="naver-site-verification" content="6e24a11cf15ee701f05bfe07ff086c5730400e73"><meta><title>【Causal Inference②】조작변수법(IV)에 관하여 - Jay Sung&#039;s DS blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Jay Sung&#039;s DS blog"><meta name="msapplication-TileImage" content="https://i.imgur.com/ijBb95M.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Jay Sung&#039;s DS blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta description><meta property="og:type" content="blog"><meta property="og:title" content="【Causal Inference②】조작변수법(IV)에 관하여"><meta property="og:url" content="https://jaysung00.github.io/2020/12/04/CN2/"><meta property="og:site_name" content="Jay Sung&#039;s DS blog"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://i.imgur.com/hHuRkYo.jpg"><meta property="article:published_time" content="2020-12-04T08:34:44.000Z"><meta property="article:modified_time" content="2020-12-04T08:50:16.759Z"><meta property="article:author" content="Jay Sung"><meta property="article:tag" content="causal"><meta property="article:tag" content="통계적 인과추론"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://i.imgur.com/hHuRkYo.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://jaysung00.github.io/2020/12/04/CN2/"},"headline":"Jay Sung's DS blog","image":["https://i.imgur.com/hHuRkYo.jpg"],"datePublished":"2020-12-04T08:34:44.000Z","dateModified":"2020-12-04T08:50:16.759Z","author":{"@type":"Person","name":"Jay Sung"},"description":""}</script><link rel="canonical" href="https://jaysung00.github.io/2020/12/04/CN2/"><link rel="icon" href="https://i.imgur.com/ijBb95M.png"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-182943513-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-182943513-1');</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/rss2.xml" title="Jay Sung's DS blog" type="application/rss+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/About-this-blog/">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/jaysung00"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-10-widescreen"><div class="card"><div class="card-image"><span class="image is-7by3"><img class="fill" src="https://i.imgur.com/hHuRkYo.jpg" alt="【Causal Inference②】조작변수법(IV)에 관하여"></span></div><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time datetime="2020-12-04T08:34:44.000Z" title="2020-12-04T08:34:44.000Z">2020-12-04</time></span><span class="level-item">Updated&nbsp;<time datetime="2020-12-04T08:50:16.759Z" title="2020-12-04T08:50:16.759Z">2020-12-04</time></span><span class="level-item"><a class="link-muted" href="/categories/KOR/">KOR</a><span> / </span><a class="link-muted" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a><span> / </span><a class="link-muted" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></span></div></div><h1 class="title is-3 is-size-4-mobile">【Causal Inference②】조작변수법(IV)에 관하여</h1><div class="content"><hr>
+<a id="more"></a>
+<h1><span id="rct를-사용할-수-없을-때는-어떻게-할까">* RCT를 사용할 수 없을 때는 어떻게 할까?</span></h1>
+<hr>
+<p>Level 1. 실험(Experimental) 레벨 (개입연구)</p>
+<ul>
+<li>관찰자(해석자)가 개입의 계획을 세워서 데이터를 수집 <span class="math inline">\(\rightarrow\)</span> RCT (무작위화비교실험)</li>
+</ul>
+<p><br></p>
+<h3><span id="blacktriangleright-level-2-준실험quasi-experimental-레벨"><span class="math inline">\(\blacktriangleright\)</span> Level 2. 준실험(Quasi Experimental) 레벨</span></h3>
+<ul>
+<li><p>비교적 질 좋은 관찰연구 정도의 느낌</p></li>
+<li><p>실험데이터가 아니라 <strong>관찰데이터</strong> 를 사용해서, 개입의 여부 등으로 결과에의 영향을 추정</p></li>
+<li><p><strong>측정되지 않은 교란인자</strong>를 처리할 수 있는 것은 사실상 RCT만이 쉽게 가능하지만, <strong>모든 교란인자를 충분히 측정할 수 있다고 하면</strong> 준실험설계로도 충분히 인과관계를 설명할 수 있다.</p></li>
+<li><p><strong>변수조작법(IV)</strong> , <strong>차의 차 분석(DID)</strong> , <strong>경향스코어 매칭(PS)</strong> , <strong>회귀불연속 디자인(RDD)</strong> 등이 있다.</p></li>
+</ul>
+<p><br></p>
+<p>Level 3. 관찰(Observation) 레벨</p>
+<ul>
+<li>더욱 인과추론 하기에 취약한 관찰연구 디자인</li>
+</ul>
+<p><br></p>
+<hr>
+<h1><span id="i-조작변수법-iv-instrumental-variable-methods"><span class="math inline">\(I\)</span>. 조작변수법 (IV; Instrumental variable methods)</span></h1>
+<hr>
+<h3><span id="-조작변수법이란">- 조작변수법이란?</span></h3>
+<ul>
+<li>매우 어렵지만 이론상 완벽하게 설계된다면 <strong>측정되지 않은 교란인자</strong> 도 처리할 수 있는 방법.</li>
+</ul>
+<p><br></p>
+<ul>
+<li><p><strong>외생변수</strong> ; 모델의 밖에서 결정되어 주어진 변수 (설명변수로써 바람직하다).</p>
+<ul>
+<li><strong>모델의 잔차항</strong> 과 독립하게 된다.</li>
+</ul></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p><strong>내생변수</strong> ; 모델 내에서 결정되는 변수 (설명변수로써 바람직하지 않다).</p>
+<ul>
+<li>예를 들어 <em>측정되지 않은 교란인자</em> 가 있는 경우 영향을 받는 <strong>설명변수와 모델의 잔차항 사이에 상관</strong> 관계가 생겨버리고 이 설명변수는 <strong>내생변수</strong> 가 되어 <em>내생성 바이어스</em> 를 만든다.</li>
+</ul></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>이렇게 발생된 <strong>내생변수</strong> 를 <strong>외생화</strong> 하기 위해 도입된 변수 <span class="math inline">\(Z\)</span>를 <strong>조작변수(IV)</strong> 라고 한다.</p></li>
+<li><p>이러한 조작변수를 이용해, 설명변수가 결과에 미치는 영향을 평가하는 방법을 <strong>조작변수법</strong> 이라고 한다.</p></li>
+</ul>
+<p><br></p>
+<blockquote>
+<p><span class="math inline">\([ 예시 ]\)</span><br>
+<img src="https://i.imgur.com/Q8xihRF.png" width="550px"><br>
+- 참의 관계 : <span class="math inline">\(ln(wage) = a + b \cdot educ + c \cdot ability + u\)</span></p>
+</blockquote>
+<p>임금(Wage)와 교육년수(Education)와 능력(Ability)은 위와 같은 관계가 있다고 가정한다.</p>
+<p>그러나 능력은 실제로 측정불가하기 때문에 교육수준만으로 임금과의 관계를 설명하는 모델을 작성했다고 하자.</p>
+<ul>
+<li><span class="math inline">\(ln(wage) = a&#39; + b&#39; \cdot educ + v\)</span></li>
+</ul>
+<p>이 때, 능력(Ability)은 <strong>관측되지 않은 교란인자</strong> 가 되고 계수 <span class="math inline">\(b&#39;\)</span>에는 내생성 바이어스가 존재하게 된다.</p>
+<p><br></p>
+<h3><span id="-조작변수법의-과정">- 조작변수법의 과정</span></h3>
+<p><strong>내생변수</strong> 를 피설명변수로 별도의 조작변수 <span class="math inline">\(IV\)</span>를 통해 설명하는 모델을 작성한다.</p>
+<ul>
+<li><span class="math inline">\(\begin{align} ln(wage) &amp;= a&#39; + b&#39; \cdot educ + \underline v \\ &amp;= a&#39; + b&#39; \cdot educ + \underline {c&#39; \cdot X+ v&#39;} \end{align}\)</span></li>
+</ul>
+<p><span class="math inline">\(\space\space\space\space\space\space\space\space\space\space\space\space\space\)</span> (C를 잔차항에 포함된 <em>교란인자</em> 라고 가정)</p>
+<ul>
+<li><span class="math inline">\(\bf educ = \alpha + \beta \cdot \underline {IV} + \gamma \cdot X + \epsilon\)</span><br>
+<br><br>
+<img src="https://i.imgur.com/SJ5bifx.png" width="600px"></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p><strong>조작변수 <span class="math inline">\(\bf IV\)</span>의 조건</strong></p>
+<ol type="1">
+<li><p>Exclusion restriction : IV는 원래의 결과부분에 해당하는 변수(Wage)에게 개입변수(설명변수, Education)를 통해서만 영향을 줄 수있다.</p></li>
+<li><p>No instrument-outcome confounder：IV와 원래의 결과부분에 해당하는 변수(Wage)에게 동시에 영향을 주는 <strong>공통의 원인(L 또는 X)</strong> 이 존재하지 않아야 한다</p></li>
+<li><p>Instrument relevance : 개입변수(설명변수, Education)에게는 확실히 영향을 주는 변수여야 한다.</p></li>
+<li><p>Monotonicity : 조작변수가 역효과를 내는 사람(Defiers)이 존재하지 않아야 한다. (완전히 반대로 움직이는 케이스)</p></li>
+</ol></li>
+</ul>
+<p>이상의 조건을 만족하는 조작변수를 발견해, 이를 통해 교란인자에 의한 효과를 제거한다.<br>
+<br></p>
+<h4><span id="그러나-이러한-조건을-만족하는-조작변수를-찾아내는-것은-매우-어렵고-특히-비즈니스-현장에서는-거의-불가능에-가깝다">【그러나, 이러한 조건을 만족하는 조작변수를 찾아내는 것은 매우 어렵고 특히 비즈니스 현장에서는 거의 불가능에 가깝다.】</span></h4>
+<p><br></p>
+<h3><span id="-그럼에도-불구하고-생각해보는-조작변수법iv의-활용-가능성">- 그럼에도 불구하고 생각해보는 조작변수법(IV)의 활용 가능성</span></h3>
+<ul>
+<li><p>하지만 실제 개입에서는 개입의 대상이지만 따르지 않는 경우나 대상이 아니지만 따르는 경우와 같이 참가자가 개입의도와 반대로 움직이는 경우가 존재한다.</p></li>
+<li><p><em>정책이나 치료와 같은 개입의 효과를 추정하기 위해서 개입의도대로 움직이는 부분집단만을 비교하는 것이 좋지 않을까 라는 이론</em></p></li>
+<li><p>개입을 행하는 참가자의 의도를 1과 0을 갖는 dummy <strong>조작변수 <span class="math inline">\(z\)</span></strong> 로 생각한다.</p></li>
+</ul>
+<p><img src="https://i.imgur.com/qCI2qOc.png" width="600px"></p>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\begin{equation}z= \left \{\begin{array}{l}1　(개입의도 있음) \\0　(개입의도없음)\end{array}\right.\end{equation}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(d = zd_1 + (1-z)d_0\)</span><br>
+(<span class="math inline">\(d\)</span>는 <span class="math inline">\(z\)</span>가 1일 때 <span class="math inline">\(d_1\)</span>이 되고, <span class="math inline">\(z\)</span>가 0일 때 <span class="math inline">\(d_0\)</span>이 된다.)</li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\begin{equation}d= \left \{\begin{array}{l}1　(실행) \\0　(실행하지않음)\end{array}\right.\end{equation}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(y=dy_1 + (1-d)y_0\)</span><br>
+(마찬가지로 <span class="math inline">\(y\)</span>는 <span class="math inline">\(d\)</span>가 1일 때 <span class="math inline">\(y_1\)</span>이 되고, <span class="math inline">\(d\)</span>가 0일 때 <span class="math inline">\(y_0\)</span>이 된다.)</li>
+</ul>
+<p><br></p>
+<ul>
+<li>조작변수의 가정으로, <span class="math inline">\(\bf (y_0,y_1) \perp z|d,\space\space\space d_z \perp z\)</span>를 만족한다</li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">개입의도 <span class="math inline">\(z\)</span></th>
+<th style="text-align: center;">참가자의 의사 <span class="math inline">\(d\)</span></th>
+<th style="text-align: center;">Notation</th>
+<th style="text-align: left;">상황의 해석</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"><span class="math inline">\(d_1\)</span> = 1</td>
+<td style="text-align: left;">개입의 대상이 되어서 참가자가 개입의도에 맞게 따르는 경우</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;"><span class="math inline">\(d_1\)</span> = 0</td>
+<td style="text-align: left;">개입의 대상이 되었지만 참가자가 개입의도에 따르지 않는 경우 (noncompliance)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"><span class="math inline">\(d_0\)</span> = 1</td>
+<td style="text-align: left;">개입의 대상이 아님에도 불구하고 개입의도의 방향으로 움직이는 경우</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;"><span class="math inline">\(d_0\)</span> = 0</td>
+<td style="text-align: left;">개입의 대상이 아니였기 때문에 개입의도에 따르지 않는 경우</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<h3><span id="-국소적-평균효과late-local-average-treatment-effect">- <strong>국소적 평균효과(LATE; local average treatment effect)</strong></span></h3>
+<p><br></p>
+<ul>
+<li><p>정의 ; <span class="math inline">\(\Large LATE = E(y_1-y_0|d_1=1,d_0=0)\)</span></p></li>
+<li><p>의미 ; 개입의도의 방향대로 움직여주는 부분집합에서만 측정한 효과</p></li>
+</ul>
+<p><br></p>
+<blockquote>
+<p>[예시]<br>
+<strong>콜롬비아에서 이루어진 '바우쳐제도'는 학업성적 향상의 효과가 있었을까?</strong></p>
+</blockquote>
+<blockquote>
+<p>[상황설명]<br>
+- 바우쳐제도란, 제비뽑기로 장학생을 선정해서 사립 중학교의 수업료 절반을 부담해주는 제도이다.<br>
+- 그러나 바우쳐제도 만으로 수업료를 감당하기 힘들어 제비뽑기에서 선발되어도 사립중학교의 입학을 포기하는 학생들이 존재했다.<br>
+- 부모님들의 경제적능력이 좋거나 사립학교를 선호하는 학생들은 제비뽑기에서 떨어져도 사립학교에 입학했다.</p>
+</blockquote>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\begin{equation}z= \left \{\begin{array}{l}1　(제비뽑기당첨) \\0　(제비뽑기탈락)\end{array}\right.\end{equation}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(d = zd_1 + (1-z)d_0\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\begin{equation}d= \left \{\begin{array}{l}1　(사립학교진학) \\0　(공립학교진학)\end{array}\right.\end{equation}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(y=dy_1 + (1-d)y_0\)</span> (성적)</li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>여기서 우리가 궁금한 것은 <strong>[바우쳐제도] <span class="math inline">\(\bf \rightarrow\)</span> [사립학교진학] <span class="math inline">\(\bf \rightarrow\)</span> [성적향상]</strong> 의 인과스토리(causal story)를 가진 효과이다.</p></li>
+<li><p>그러므로 우리가 관심있는 케이스는 <strong>제비뽑기에 붙으면 사립학교에 가고 떨어지면 공립학교에 진학할 학생</strong> 이다.</p></li>
+<li><p>즉, 제비뽑기에 붙던 안붙던 사립학교에 갈 학생 (<span class="math inline">\(d_1=1,d_0=1\)</span>)이나 붙던 안붙던 공립학교에 갈 학생 (<span class="math inline">\(d_1=0,d_0=0\)</span>)은 고려의 대상이 아니다.</p></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>따라서, <span class="math inline">\(ATE = E(y_1-y_0)\)</span> 를 구하면 단순히 사립학교와 공립학교의 성적 차이를 구하게 된다.</p></li>
+<li><p>이 경우 <span class="math inline">\(LATE = E(y_1-y_0|d_1=1,d_0=0)\)</span> 를 구하는 것이 바람직할 것이다.</p></li>
+</ul>
+<p><br></p>
+<h4><span id="이와-같이-준실험으로써의-조작변수법은-상당이-어렵지만-late-의-아이디어로써의-조작변수법은-생각해볼만-하다">이와 같이 준실험으로써의 조작변수법은 상당이 어렵지만 <strong>LATE</strong> 의 아이디어로써의 조작변수법은 생각해볼만 하다.</span></h4>
+<p><br><br>
+<br></p>
+<hr>
+<h2><span id="reference">* Reference</span></h2>
+<p>해당 포스트는 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.youtube.com/watch?v=u8hsTkLg2xc&amp;t=159s">유튜브 채널「データの科学のメソドロジー」의 山田典一님의 강의</a>를 틀로 내용을 정리 &amp; 추가 했음을 밝힙니다.</p>
+<p>그 외 참조</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.amazon.co.jp/dp/4000069721/ref=cm_sw_r_tw_dp_U_x_5LQxEbXZJDK4H">調査観察データの統計科学―因果推論・選択バイアス・データ融（星野崇宏）</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.ier.hit-u.ac.jp/~kitamura/lecture/Hit/08Statsys5.pdf">捜査変数法（一橋大学経済研究所, 北村 行伸）</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://healthpolicyhealthecon.com/2015/02/23/experiment-and-quasi-experiment-1/">操作変数法Instrumental variable methodsに関するブログ (津川友介)</a></p>
+</div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/causal/">causal</a><a class="link-muted mr-2" rel="tag" href="/tags/%ED%86%B5%EA%B3%84%EC%A0%81-%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적 인과추론</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=5faeaef89fba030012a7dd31&amp;product=inline-share-buttons" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/jaysung00" target="_blank" rel="external nofollow noopener noreferrer" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2020/12/04/CI1/"><i class="level-item fas fa-chevron-left"></i><span class="level-item"> </span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2020/11/14/BN1/"><span class="level-item">【 도대체 베이지안 네트워크가 뭐야? ①】</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script>var disqus_config = function () {
+            this.page.url = 'https://jaysung00.github.io/2020/12/04/CN2/';
+            this.page.identifier = '2020/12/04/CN2/';
+        };
+        (function() {
+            var d = document, s = d.createElement('script');  
+            s.src = '//' + 'jays-hexo-blog' + '.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();</script></div></div></div><!--!--><div class="column column-right is-4-tablet is-4-desktop is-4-widescreen  order-3 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">1</span><span class="level-item">* RCT를 사용할 수 없을 때는 어떻게 할까?</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">1.1.1</span><span class="level-item">\(\blacktriangleright\) Level 2. 준실험(Quasi Experimental) 레벨</span></span></a></li></ul></ul></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2</span><span class="level-item">\(I\). 조작변수법 (IV; Instrumental variable methods)</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.1</span><span class="level-item">- 조작변수법이란?</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.2</span><span class="level-item">- 조작변수법의 과정</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.3</span><span class="level-item">- 그럼에도 불구하고 생각해보는 조작변수법(IV)의 활용 가능성</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.4</span><span class="level-item">- 국소적 평균효과(LATE; local average treatment effect)</span></span></a></li></ul><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.2</span><span class="level-item">* Reference</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time datetime="2020-12-04T08:37:44.640Z">2020-12-04</time></p><p class="title"><a href="/2020/12/04/CI1/"> </a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/12/04/CN2/"><img src="https://i.imgur.com/hHuRkYo.jpg" alt="【Causal Inference②】조작변수법(IV)에 관하여"></a></figure><div class="media-content"><p class="date"><time datetime="2020-12-04T08:34:44.000Z">2020-12-04</time></p><p class="title"><a href="/2020/12/04/CN2/">【Causal Inference②】조작변수법(IV)에 관하여</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/11/14/BN1/"><img src="https://i.imgur.com/8FGRRsH.png" alt="【 도대체 베이지안 네트워크가 뭐야? ①】"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-14T14:15:12.000Z">2020-11-14</time></p><p class="title"><a href="/2020/11/14/BN1/">【 도대체 베이지안 네트워크가 뭐야? ①】</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/11/14/BN2/"><img src="https://i.imgur.com/8FGRRsH.png" alt="【 도대체 베이지안 네트워크가 뭐야? ②】"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-14T14:15:12.000Z">2020-11-14</time></p><p class="title"><a href="/2020/11/14/BN2/">【 도대체 베이지안 네트워크가 뭐야? ②】</a></p><p class="categories"><a href="/categories/KOR/">KOR</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/">통계적인과추론</a> / <a href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/">ML</a></p></div></article></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/KOR/"><span class="level-start"><span class="level-item">KOR</span></span><span class="level-end"><span class="level-item tag">3</span></span></a><ul><li><a class="level is-mobile" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/"><span class="level-start"><span class="level-item">통계적인과추론</span></span><span class="level-end"><span class="level-item tag">3</span></span></a><ul><li><a class="level is-mobile" href="/categories/KOR/%ED%86%B5%EA%B3%84%EC%A0%81%EC%9D%B8%EA%B3%BC%EC%B6%94%EB%A1%A0/ML/"><span class="level-start"><span class="level-item">ML</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></li></ul></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a><p class="is-size-7"><span>&copy; 2020 Jay Sung</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="external nofollow noopener noreferrer">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'folded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>
