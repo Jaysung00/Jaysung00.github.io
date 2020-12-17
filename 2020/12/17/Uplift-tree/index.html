@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="naver-site-verification" content="6e24a11cf15ee701f05bfe07ff086c5730400e73"><meta><title>【Uplift Modeling】Uplift tree에 관한 논문 내용 번역 - Jay Sung&#039;s DS blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Jay Sung&#039;s DS blog"><meta name="msapplication-TileImage" content="https://i.imgur.com/ijBb95M.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Jay Sung&#039;s DS blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta description="해당 포스팅은 Tree-based Uplift Modeling에 관련된 논문 및 문헌들의 번역임을 밝힙니다."><meta property="og:type" content="blog"><meta property="og:title" content="【Uplift Modeling】Uplift tree에 관한 논문 내용 번역"><meta property="og:url" content="https://jaysung00.github.io/2020/12/17/Uplift-tree/"><meta property="og:site_name" content="Jay Sung&#039;s DS blog"><meta property="og:description" content="해당 포스팅은 Tree-based Uplift Modeling에 관련된 논문 및 문헌들의 번역임을 밝힙니다."><meta property="og:locale" content="en_US"><meta property="og:image" content="https://i.imgur.com/CUUFwx3.png"><meta property="article:published_time" content="2020-12-17T01:53:17.000Z"><meta property="article:modified_time" content="2020-12-17T02:00:59.936Z"><meta property="article:author" content="Jay Sung"><meta property="article:tag" content="Uplift modeling"><meta property="article:tag" content="Uplift Tree"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://i.imgur.com/CUUFwx3.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://jaysung00.github.io/2020/12/17/Uplift-tree/"},"headline":"Jay Sung's DS blog","image":["https://i.imgur.com/CUUFwx3.png"],"datePublished":"2020-12-17T01:53:17.000Z","dateModified":"2020-12-17T02:00:59.936Z","author":{"@type":"Person","name":"Jay Sung"},"description":"해당 포스팅은 Tree-based Uplift Modeling에 관련된 논문 및 문헌들의 번역임을 밝힙니다."}</script><link rel="canonical" href="https://jaysung00.github.io/2020/12/17/Uplift-tree/"><link rel="icon" href="https://i.imgur.com/ijBb95M.png"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-182943513-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-182943513-1');</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/rss2.xml" title="Jay Sung's DS blog" type="application/rss+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/About-this-blog/">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/jaysung00"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-10-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time datetime="2020-12-17T01:53:17.000Z" title="2020-12-17T01:53:17.000Z">2020-12-17</time></span><span class="level-item">Updated&nbsp;<time datetime="2020-12-17T02:00:59.936Z" title="2020-12-17T02:00:59.936Z">2020-12-17</time></span><span class="level-item"><a class="link-muted" href="/categories/UPLIFT-MODELING/">UPLIFT MODELING</a><span> / </span><a class="link-muted" href="/categories/UPLIFT-MODELING/c-Methods/">c.Methods</a><span> / </span><a class="link-muted" href="/categories/UPLIFT-MODELING/c-Methods/2-Tree-based-Algorithm/">2.Tree-based Algorithm</a></span></div></div><h1 class="title is-3 is-size-4-mobile">【Uplift Modeling】Uplift tree에 관한 논문 내용 번역</h1><div class="content"><p>해당 포스팅은 Tree-based Uplift Modeling에 관련된 논문 및 문헌들의 번역임을 밝힙니다.</p>
+<a id="more"></a>
+<hr>
+<p><strong><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stochasticsolutions.com/pdf/sig-based-up-trees.pdf">Radcliffe &amp; Surry (2011)</a></strong></p>
+<h2><span id="real-world-uplift-modelling-with-significance-based-uplift-trees">Real-World Uplift Modelling with Significance-Based Uplift Trees</span></h2>
+<p><br></p>
+<h4><span id="section61-tree-based-uplift-modeling">Section6.1 Tree-based Uplift Modeling</span></h4>
+<p>CART와 같이 두 가지로 분할하는 일반적 tree-based model의 <code>split(분할)</code>을 결정하는 기준의 아래의 두가지의 바람직한 속성들은 서로 trade-off 관계에 있다.</p>
+<ul>
+<li><p>두가지 하위그룹의 <code>outcome</code>을 최대화 화는 것</p></li>
+<li><p>그러한 두가지 그룹의 <code>size</code>의 차를 최소화 하는 것</p></li>
+</ul>
+<p>일반적으로 극단적인 <code>outcome</code>을 보이는 작은 그룹을 찾는 것은 어렵지 않기 때문에 이것들은 본질적으로 충돌하는 경향이 있다. 예를 들어, 단 한명의 구매자 (100%의 구매율)만을 <code>split</code>해서 떼어내는 경우를 생각해볼 수 있다.</p>
+<p>우리는 같은 관점으로, 다만 분할된 그룹들간의 <code>outcome</code>의 차이가 아닌 분할된 그룹들간의 <code>Uplift</code>의 차이를 Uplif trees의 split 조건으로써 접근할 것이다.</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.sciencedirect.com/science/article/abs/pii/S1094996802701618">Hansotia &amp; Rukstales (2001)</a>의 방법은 Trade-off를 무시하고 직접적으로 <code>Uplift</code>의 차이(<span class="math inline">\(\Delta\Delta p\)</span>)를 사용한 결과이다. 우리는 이 접근법으로 좋은 결과를 얻지 못했다.</p>
+<p>우리는 split의 기준으로써 Qini를 직접적으로 이용하는 방법 또한 시도했다. Qini는 분할된 하위그룹들의 Size와 Uplift 변화를 모두 고려한다. 우리는 전체적인 Uplift model의 성능을 평가하는데 유용한 Qini를 찾았지만 이것을 split의 기준으로 사용하는데는 제한적인 성공밖에 얻지 못하였다. Qini가 rank의 순서를 매기는 것만을 측정한다는 사실이 이러한 결과의 원인이 되었을 것이다.</p>
+<p>또한 그룹간의 size의 차이를 일종의 penalty로 간주하여 원래의 uplift 차이를 조정하는 특별한 접근법을 취할 수도 있다. 만약 원래의 uplift 차이가 <span class="math inline">\(\Delta\)</span>이고 두개의 하위그룹의 size가 <span class="math inline">\(N_L\)</span> <span class="math inline">\(N_R\)</span>이라고 한다면, 어떠한 k값에 대하여 penalty를 부여받은 split 조건의 후보는 이하와 같을 수 있다.</p>
+<p><span class="math inline">\(\Delta / (\cfrac{N_L+N_R}{2min(N_L,N_R)})^k\)</span></p>
+<p>이 분모의 penalty는 하위그룹의 size가 서로 같을 때 1을 갖고, 서로 달라질 수 록 큰 값을 갖는다. (결과적으로 penalty를 받은 uplift는 원래보다 작은 값으로 평가된다.)</p>
+<p>어떠한 k에 대한 또다른 penalty의 대안은 이하와 같다.</p>
+<p><span class="math inline">\(\Delta (1- {\large \lvert \frac{N_L-N_R}{N_L+N_R} \rvert}^k)\)</span></p>
+<p>여기서 penalty는 하위그룹의 size가 같을 때 0이 되고 사이즈가 달라지면서 1에 가까워 진다. (두 경우 모두 k는 경험적으로 설정되어야 할 하이퍼파라미터이다.)</p>
+<p>그러나 우리는 실제 세상의 어떠한 문제에 대해서도 잘 작동하는 penalty를 찾지 못했다.</p>
+<hr>
+<p><strong><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tech.wayfair.com/data-science/2019/10/modeling-uplift-directly-uplift-decision-tree-with-kl-divergence-and-euclidean-distance-as-splitting-criteria/">George Fei's blog (2019)</a></strong></p>
+<h2><span id="modeling-uplift-directly-uplift-decision-tree-with-kl-divergence-and-euclidean-distance-as-splitting-criteria">Modeling Uplift Directly: Uplift Decision Tree with KL Divergence and Euclidean Distance as Splitting Criteria</span></h2>
+<p><br></p>
+<h4><span id="-uplift-decision-tree의-뒤에-있는-이론에-대해">- Uplift Decision Tree의 뒤에 있는 이론에 대해</span></h4>
+<p>각각의 분할기준(split criterion)이 다른 여러 Uplift Decision Tree 알고리즘이 존재한다.</p>
+<p><strong>여기서, 우리는 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.semanticscholar.org/paper/Uplift-Modeling-in-Direct-Marketing-Rzepakowski-Jaroszewicz/e979ba084f34345b2ac8783df2b4a3295ae9273f">Piotr Rzepakowski &amp; Szymon Jaroszewicz (2012)</a>에 등장하는 정보 이론적 분할기준(information theoretical splitting criteria)에 대해 논의할 것이다.</strong></p>
+<p>Single treatment uplift decision tree의 경우에, 각 node는 두개의 분리된 outcome 을 포함한다. 하나는 치료군의 결과이고 다른 하나는 대조군의 결과이다.</p>
+<p>Uplift를 최대화 하기 위해, 우리는 Tree를 타고 내려가면서 분할되는 두가지의 분포를 최대한 다르게 만들고자 한다.</p>
+<p>쿨백-라이블러 발산(<a target="_blank" rel="external nofollow noopener noreferrer" href="https://en.wikipedia.org/wiki/Relative_entropy">Kullback-Leibler divergence</a>)과 유클리드 제곱거리(squared Euclidean Distance)는 정보이론에서 분포간의 divergence를 측정하는 두가지 방법이다.</p>
+<blockquote>
+<p><strong>Equation 1.</strong><br>
+<span class="math inline">\(KL(P:Q) = \sum_ip_ilog\cfrac{p_i}{q_i}\space\space\space\space\space\space\space\space\space\space\)</span> [Kullback-Leibler Divergence between Two Distributions]<br>
+<span class="math inline">\(E(P:Q) = \sum_i(p_i-q_i)^2\space\space\space\space\space\space\space\space\space\space\)</span>[Squared Euclidean Distance between Two Distributions]</p>
+</blockquote>
+<ul>
+<li>아래첨자 <span class="math inline">\(i\)</span>는 각각의 outcome class</li>
+<li><span class="math inline">\(p_i\)</span>와 <span class="math inline">\(q_i\)</span>는 각각 치료군과 대조군에 있어서 outcome class <span class="math inline">\(i\)</span>가 될 확률</li>
+</ul>
+<p><br></p>
+<p>Tree에서 분할되어야 할 node에서, 위의 두가지 방법 중 하나를 이용해 outcome분포의 divergence를 계산할 수 있다. tree node를 children nodes로 분할시키는 'A' test 이후에 우리는 'A' test의 조건하에서 outcome class distribution의 conditional divergence를 비슷하게 측정할 수 있다.</p>
+<blockquote>
+<p><strong>Equation 2.</strong> [Conditional Divergence for a Given 'A' Test]<br>
+<span class="math inline">\(D{\large(}P^T(Y):P^C(Y)|A{\large)} = \sum_a \cfrac{N(a)}{N}D{\large(}P^T(Y|a):P^C(Y|a)\large)\)</span></p>
+</blockquote>
+<ul>
+<li><span class="math inline">\(a\)</span> : 각 자식 노드</li>
+<li><span class="math inline">\(N\)</span> : 부모노드에 있는 개체(instance)들의 총 수</li>
+<li><span class="math inline">\(N(a)\)</span> : 자식노드 <span class="math inline">\(a\)</span>에 있는 개체들의 수</li>
+<li><span class="math inline">\(D\)</span> : divergence measure</li>
+<li><span class="math inline">\(P^T(Y) , P^C(Y)\)</span> : outcome class distribution</li>
+<li><span class="math inline">\(|a\)</span> : 자식노드 <span class="math inline">\(a\)</span>의 outcome class distribution</li>
+</ul>
+<p><br></p>
+<p>최적의 분할를 위해, 우리는 치료군과 대조군 사이의 outcome class distibution 간의 divergence의 증가분(gain)를 최대화 하려고 한다. 바꿔말하자면, 아래와 같은 식을 최대화 할 것이다.</p>
+<blockquote>
+<p><strong>Equation 3.</strong> [Gain in Class Distribution Divergence for a Given 'A' Test]<br>
+<br> <span class="math inline">\(D_{gain}(A) = D{\large(}P^T(Y):P^C(Y)|A{\large)}-D{\large(}P^T(Y):P^C(Y){\large)}\)</span></p>
+</blockquote>
+<ul>
+<li>우변의 첫번째 항은 위에서 언급된 Conditional Divergence for a Given 'A' Test</li>
+<li>우변의 두번째 항은 부모노드의 outcome class distribution divergence</li>
+</ul>
+<p><br></p>
+<h4><span id="-이-이론을-설명하기-위한-example">- 이 이론을 설명하기 위한 Example</span></h4>
+<p>Uplift decision tree가 치료와 대조 class distribution의 증가분을 최대화하여 node를 어떻게 분할시키는지 더 잘 설명하기 위해 다음의 예를 제시한다.</p>
+<p>주어진 Tree node에 8명의 고객에 해당하는 총 8개의 데이터 포인트가 있으며, 치료군과 대조군에 각각 4명의 고객이 있다고 상상해보자. 치료 그룹의 고객 4명중 3명이 캠페인에 반응(전환; convert)했고, 대조 그룹의 고객 4명 중 2명이 반응을 하였다. 우리는 치료군과 대조군 사이의 outcome class distibution 간의 divergence의 증가분(gain)를 최대화 하도록 이 노드를 분할하는 방법을 찾고 싶다.</p>
+<p><img src="https://i.imgur.com/CUUFwx3.png" width="500px"><br>
+[자식노드의 결과에 존재하는 분포 차이를 최대화하여 decision tree node가 분할 되는 예]</p>
+<p>이론적으로 Uplift decision tree의 분할기준은 여러가지의 분할(Multiway splits)와 호환된다. 그러나 실제 구현에서는 이 예에서와 같이 분할이 두개의 하위 노드만 생성하는 이진 분할이 더 일반적이다. 우리는 위의 그림에 나타난 분할가 우리가 찾고있는 최적의 분할이라고 주장하고자 한다. 이러한 주장을 증명하기 위해, 먼저 유클리드 제곱거리(squared Euclidean Distance)를 통해 divergence를 측정하보자.</p>
+<p><br><br>
+1. 먼저 부모노드의 class distribution의 divergence를 구한다.</p>
+<p><span class="math inline">\(D{\large(}P^T(Y):P^C(Y){\large)} = \sum_{\large i \in \{converted, not\space converted \}}(p_i - q_i)^2 = (0.75 - 0.5)^2 + (0.25 - 0.5)^2 = 0.125\)</span></p>
+<p>이것은 단순히 반응률(전환률; conversion rate)의 치료군과 대조군 간 유클리드 제곱거리와 비반응률(비전환률; non-conversion rate)의 치료군과 대조군 간의 유클리드 제곱거리 더한 값이다.</p>
+<p><br><br>
+2. 부모노드에서와 같이 분할된 두개의 자식노드에서도 class distribution divergence들을 각각 구한다.</p>
+<p><em>In left child node</em> , <span class="math inline">\(\sum_{\large i \in \{converted, not\space converted \}}(p_i - q_i)^2 = (1 - 0)^2 + (0 - 1)^2 = 2\)</span></p>
+<p><em>In right child node</em> , <span class="math inline">\(\sum_{\large i \in \{converted, not\space converted \}}(p_i - q_i)^2 = (0 - 1)^2 + (1 - 0)^2 = 2\)</span></p>
+<p><br><br>
+3. 분할를 통한 divergence의 개선에 미친 두 자식노드의 상대적인 영향을 정규화하기 위해, 분할의 조건하에서 outcome class distribution의 conditional divergence를 구한다. (Eq.2)</p>
+<p><span class="math inline">\(D{\large(}P^T(Y):P^C(Y)|A{\large)} = \sum_{\large a \in \{left\space child,\space right\space child \} }\cfrac{N(a)}{N} D{\large (} P^T(Y|a) : P^C(Y|a){\large)} = \cfrac{5}{8}\cdot2 + \cfrac{3}{8}\cdot2 = 2\)</span></p>
+<p><br><br>
+4. 분할가 이루어졌을 때, 치료군과 대조군 사이의 outcome class distibution 간의 divergence의 증가분(gain)을 구한다. (Eq.3)</p>
+<p><span class="math inline">\(D_{gain}(A) = D{\large(}P^T(Y):P^C(Y)|A{\large)}-D{\large(}P^T(Y):P^C(Y){\large)} = 2-0.125 = 1.875\)</span></p>
+<p>두 개의 자손의 class distribution이 가장 다를 때 (즉 divergence가 가장 클 때) 두 자손의 유클리드 제곱거리가 가장 최대화 되므로, 위의 계산 결과는 최대값이라고 할 수있다.</p>
+<p><br></p>
+<p>다시 말해, <strong>왼쪽 자식노드의 클래스 분포는 치료군과 통제군을 비교했을 때 가장 <code>Persuadables</code>에 가까운 분포가 되게끔 하고, 오른쪽 자식노드의 클래스 분포는 가장 <code>Sleeping Dogs</code>에 가까운 분포가 되게끔 하는 split을 선택하는 것이다.</strong></p>
+<p>모델이 훈련될 때, 이용가능한 특징량의 여러가지 다양한 값에 대해 여러 split을 반복하면서 이러한 최적화 split이 찾아질 것이다.</p>
+<p><br></p>
+<h4><span id="-잠재적인-준準최적-분할-potential-suboptimal-splits">- 잠재적인 준(準)최적 분할 (Potential Suboptimal Splits)</span></h4>
+<p>위에서 제시한 분할 전략에 존재할 수 있는 이하의 <em>두가지 잠재적인 문제</em> 에 대처해야할 필요가 있다.</p>
+<p><br> 1. 고르지 못한 치료/통제군의 분할</p>
+<p>먼저, 고르지 못한 치료/통제군의 분할는 알고리즘이 대부분의 치료개체들을 하나의 하위나무에 집어넣고 그 나무에 거의 통제클래스의 개체들이 존재하지 않을때 일어난다. 이것은 분할에 사용된 특징량이 치료할당 라벨과 높은 상관관계를 가진다는 것을 의미한다. 즉 Uplift modeling의 필수적인 가정인 <strong>Unconfounded assumption</strong> 이 위반된다는 것을 의미한다. 더욱이 모든 leaf node는 충분한 치료와 통제 개체들을 포함해야 하므로 이러한 분할는 앞으로의 분할를 더욱 어렵게 만들 것이다.</p>
+<p><br> 2. 여러개의 자손노드로 나누는 분할를 선택하는 알고리즘의 경향성</p>
+<p>여러개의 자손노드로 나누는 분할는, 훈련데이터에 적용되었을 때 더 높은 증가분(gain)을 갖는 경향성이 있기 때문에 발생한다. 그러나 테스트데이터에는 제대로 추론해내지못하며 결과적으로 overfitting을 발생시킨다.</p>
+<p>아래에 제시된 정규화인수(Normalization factor)들은 앞에 언급한 바이어스를 시정하기 위해 고안되었다. 쿨백-라이블러 발산과 유클리드 제곱거리를 통한 두가지 분할기준과 마찬가지로 이 또한 두가지 다른 유형의 정규화값을 가진다.</p>
+<blockquote>
+<p><strong>Equation 4</strong> [Normalization Value for Splitting Based on KL Divergence]<br>
+<span class="math inline">\(I(A)=H(\cfrac{N^T}{N},\cfrac{N^C}{N})KL(P^T(A):P^C(A))+\cfrac{N^T}{N}H(P^T(A))+\cfrac{N^C}{N}H(P^C(A))+\cfrac{1}{2}\)</span></p>
+</blockquote>
+<blockquote>
+<p><strong>Equation 5</strong> [Normalization Value for Splitting Based on Euclidean Distance]<br>
+<span class="math inline">\(J(A) = Gini(\cfrac{N^T}{N},\cfrac{N^C}{N})E(P^T(A):P^C(A))+\cfrac{N^T}{N}Gini(P^T(A))+\cfrac{N^C}{N}Gini(P^C(A))+\cfrac{1}{2}\)</span></p>
+</blockquote>
+<p>두 penalty항이 상당히 비슷하기 때문에, 여기서는 유클리드 제곱거리에 대해서만 논할 것이다. (Eq.5)</p>
+<p><span class="math inline">\(J(A)=\)</span></p>
+<p>ⅰ. <span class="math inline">\(Gini(\cfrac{N^T}{N},\cfrac{N^C}{N})\cdot E(P^T(A):P^C(A))\)</span></p>
+<ul>
+<li><p>첫번째 항은 고르지 못한 치료/통제군의 분할을 예방한다.</p></li>
+<li><p>이 항의 앞부분은 부모노드의 지니 불순도(Gini impurity)<span class="math inline">\(^{[*1]}\)</span>이고, 부모노드의 치료/통제의 불균형이 클 수록 0에 가까워지는 값이다. 이렇게 설정된 이유는 부모노드에 이미 큰 치료/통제 불균형이 존재하는 경우, 결과적으로 따라오는 자식노드의 불균형에 대해 계속적으로 처벌하는 것은 공정하지 않기 때문이다.</p></li>
+<li><p>이 항의 뒷부분은 모든 자식노드에서의 치료비율과 통제비율간의 유클리드 제곱거리이다. 이 값은 모든 자식노드에서 두 비율이 동일한 경우에만 최소화된다.</p></li>
+</ul>
+<p><br></p>
+<p>ⅱ. <span class="math inline">\(+\cfrac{N^T}{N}Gini(P^T(A))+\cfrac{N^C}{N}Gini(P^C(A))\)</span></p>
+<ul>
+<li><p>이어지는 두 항은 여러개의 자손노드로 분할되는 것에 대해 penalty를 부여한다.</p></li>
+<li><p>이는 같은 문제를 전통적인 decision tree algorithm이 처리하는 방식과 비슷하다.</p></li>
+<li><p>지니 불순도는 분할에 의해 자손노드의 개수가 증가할 때 증가한다. 예를 들어 두개의 동등한 자손노드로 분할가 이루어 질 때 <span class="math inline">\(1 - 0.5^2 -0.5^2 = 0.5\)</span> 가 되고, 4개의 동등한 자손노드로 분할될 때 <span class="math inline">\(1-4\cdot 0.25^4 = 0.75\)</span>가 된다.</p></li>
+</ul>
+<p><br></p>
+<p>ⅲ. <span class="math inline">\(+\cfrac{1}{2}\)</span></p>
+<ul>
+<li>마지막 <span class="math inline">\(\cfrac{1}{2}\)</span> 항은. 작은 증가분(gain)을 갖지만 작은 정규화요인으로 나눔으로써 과대평과되는 분할를 선호하지 않기 위해 존재한다.</li>
+</ul>
+<p><br></p>
+<p><span style="font-size: 85%"> <span class="math inline">\(^{[*1]}:\)</span> 지니 불순도는 부분 집합에서 무작위로 선택한 원소가 부분 집합의 라벨 분포에 따라 무작위로 라벨을 붙인 경우 얼마나 자주 잘못 라벨을 붙이는지를 측정한 것이다. 라벨 <span class="math inline">\(i\)</span>가 선택되는 확률 <span class="math inline">\(p_i\)</span>과 실수할 확률<span class="math inline">\(1-p_i\)</span>을 곱해서 모든 개체에 대해 합산해서 계산한다. <span class="math inline">\(\sum^J_{i=1}p_i(1-p_i)=\sum^J_{i=1}(p_i-p_i^2)=\sum^J_{i=1}p_i-\sum^J_{i=1}p_i^2=1-\sum^J_{i=1}p_i^2\)</span> </span></p>
+<hr>
+<p><strong><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.diva-portal.org/smash/get/diva2:1328437/FULLTEXT01.pdf">Henrik Karlsson (2019)</a></strong></p>
+<h2><span id="uplift-modeling-identifying-optimal-treatment-group-allocation-and-whom-to-contact-to-maximize-return-on-investment">Uplift Modeling: Identifying Optimal Treatment Group Allocation and Whom to Contact to Maximize Return on Investment</span></h2>
+<p><br></p>
+<h3><span id="413-model-uplift-directly">4.1.3 Model Uplift Directly</span></h3>
+<p>tree기반의 알고리즘은 데이터를 하위그룹으로 나누고 평가하기 위해 설계되었다. 이것은 차이를 치료군과 대조군간의 차이와 같이 차이(differences)를 모델링하는 데에 유용하다. tree기반의 방법은 uplift 분야에서 일반적으로 여러 연구자들에게 활용되어왔다.</p>
+<p><br></p>
+<h4><span id="-general-tree-based-methods">- General Tree-based Methods</span></h4>
+<p>Tree기반 방법은 크게 나눠서 분할(splitting)와 가지치기(pruning)라는 두가지 스텝을 가지고 있다.</p>
+<p>분할 스텝은 데이터를 분리해서 <em>pure</em> 한 노드를 가능한 한 생성하는 최적의 분할를 찾기 위해 노력한다. 가지치기 스텝은 나무의 일반화를 개선하지 못하는 노드나 가지들을 제거한다.</p>
+<p>노드가 <em>pure</em> 하다는 것은 노드에 속한 모든 데이터 포인트가 가능한 한 가장 비슷하다는 것을 의미한다. tree알고리즘의 타입에 따라, 각 노드는 (CART tree와 같이) 두개의 노드로 나누어질 수 도있고, (CHAID tree와 같이) 여러개의 노드로 나누어질 수도 있다.</p>
+<p>알고리즘은 모든 노드들이 완전히 <em>pure</em> 해지거나, 혹은 멈추는 기준을 만족할 때까지 노드를 계속해서 분할시키며 tree를 자라게한다. 만약 tree가 모든 노드가 <em>pure</em> 해질 때까지 자란다면, 모델은 훈련데이터를 완벽히 정확하게 분류할 것이다. 그러나 그 결과는 overfitting되어 새로운 데이터에 잘 일반화되지 않을 것이다. tree의 분할지점을 정하기 위해 정보 이득(information gain)을 계산하고, 정보 이득이 가장 높은 잠재적 분할가 수행될 것이다.</p>
+<p>정보이득은 자식노드에 할당된 데이터의 비율에 노드의 순도(purity)를 곱하여 추정한다.</p>
+<p>CART나 Quinlan's C4.5 tree와 같은 많은 tree기반의 방법들이 이러한 하향식으로 노드를 분할한 뒤 도움이 되지 않는 분할을 가지치기하는 2step 접근방법을 사용한다. 이러한 접근방법을 활용하는 이유는 tree method가 매우 선형적이지 않고 그에 따라 선택된 특징량들의 상호작용에 강하게 의존하기 때문이다.</p>
+<p>예를 들어, 주어진 분할가 현재 노드에서만 평가될 때 의미가 없어 보일 수 있지만, 그보다 더 아래로 분할될 때 현재 분할와 관련지어져 매우 중요해질 수 있다.<br>
+즉 각 분할은 미래의 분할 가능성을 무시한 현재 노드에서 평가되므로, 분할가 많은 깊은 tree를 만들고 그 후에 충분히 기여하지 못한 분할를 가지치기하는 것이다.</p>
+<p>tree의 깊이를 제한하는 정지 기준을 삽입하여 가지치기 작업을 tree에 적용하거나 두 가지를 함께 적용함으로써 오버피팅을 피할 수 있다. 가지치기 작업은 사용 중인 tree의 종류에 따라 유의성 시험에 근거하여 분할 전 또는 tree의 성장이 끝난 후에 수행할 수 있다. 후자의 방법이 더 일반적이다.</p>
+<p>일반적으로 깊게 자라는 것이 허용된 decision tree는 동일한 데이터셋으로 학습을 했음에도 불구하고 서로 다른 tree들 간의 바이어스가 낮고 분산이 높다. (low bias and high variance <span class="math inline">\(\rightarrow\)</span> <strong>Overfitting</strong> )</p>
+<p>깊은 tree 모델은 데이터를 잘 분류할 수 있기 때문에 바람직하다고 할 수있지만, 서로 다른 decision tree 간의 높은 분산이 robust<span class="math inline">\(^{[*2]}\)</span>하지 못한 결과를 낳는다. 이러한 decision tree간의 분산을 줄이기 위해 Random forest algorithm이 개발되었다. 이것은 많은 decision tree를 만들고 각 tree의 결과를 평균하여 더 robust한 결과를 얻는다. 이것은 모델에서 약간 더 많은 바이어스라는 cost를 수반하지만, 그 결과로 분산이 감소한다. Random forest는 Bagging을 사용하고 각각의 tree들을 다른 특징의 부분집합으로 훈련시켜 deep tree의 효과를 훨씬 더 평균화하는 데 도움을 준다. 이 보고서에서는 uplift random forest는 특징량갯수의 제곱근을 사용하여 각 tree를 훈련시킨다.</p>
+<p><br><br>
+<span style="font-size: 85%"> <span class="math inline">\(^{[*2]}:\)</span> 머신러닝 알고리즘에서 robust는 일반적으로 알고리즘의 강건성을 가리킨다. 머신러닝 알고리즘이 robust하다고 간주되려면 testing error가 training error와 일치해야 하거나 데이터 집합에 노이즈를 추가한 후에도 성능이 안정적이어야 한다. </span></p>
+<h4><span id="-tree-based-methods-for-estimating-uplift">- Tree-based Methods for Estimating Uplift</span></h4>
+<p>Tree기반 알고리즘을 사용하여 Uplift Modeling을 할 때는 Uplift가 포착될 수 있도록 분할기준을 조정한다. 문헌에 따르면 Uplift를 가장 잘 추정하기 위해 분할기준을 조정하는 몇 가지 방법이 제시되어 있으며, 어떤 방법이 가장 좋은지에 대한 합의는 아직 이루어지지 않은 것으로 보인다. Hansotia and Rukstales (2002)는 '각 자식노드(binary)에서의 치료군과 대조군의 확률 차이' 사이의 차이를 최대화 하기 위한 분할기준을 제시했다.<br>
+Rzepakowski &amp; Jaroszewicz (2012)는 정보이론으로 부터 '차이'의 개념을 분할 기준으로 도입했는데, Tree기반의 알고리즘이 치료군과 대조군 사이의 분포적 차이를 최대화하려고 노력함으로써 상승을 포착한다. 이 보고서는 Rzepakowski &amp; Jaroszewicz (2012)의 분할 기준을 사용할 것이다.</p>
+<p>Distributional divergence(분포의 차이)란 q(x)를 p(x)의 근사치로 사용할 때 손실되는 정보의 양을 나타내는 척도로, 여기서 q(x)는 일반적으로 표본데이터를 나타내고 p(x)는 이론적인 분포로부터 도출된 데이터로 나타내어진다. 이 divergence는 두 확률분포 사이의 "거리"이지만, 대칭적이거나 삼각부등식을 만족할 필요가 없으므로 미터법 거리보다 약한 척도이다. divergence 척도를 분할기준으로 사용할 경우 모든 노드에서 치료군과 대조군 사이의 차이를 최대화하려고 한다. tree들의 앙상블을 사용하려고 할 때, 예측되는 Uplift값은 개별 tree에서의 예측 Uplift값을 평균하여 얻는다. 분할기준으로 사용되는 네 가지 다른 divergence 척도는 아래에서 확인할 수 있다.</p>
+<p><br></p>
+<p>Rzepakowski &amp; Jaroszewicz(2012)는 Uplift을 포착하기 위해 분할 기준이 충족해야 하는 세 가지 항목을 제시한다.</p>
+<ol type="1">
+<li><p>치료군과 대조군의 class 분포가 모든 분할에서 동일할 경우 분할기준치를 최소값으로 평가해야 한다.</p>
+<ul>
+<li>Uplift는 치료군과 대조군 사이의 가능한 가장 큰 분포차이를 만들어냄으로써 포착되기 때문에, 두 집단이 동일할 때는 분할기준치가 최소값으로 평가되는 것이 타당하다.</li>
+</ul></li>
+<li><p>분할기준치는 test가 치료군과 대조군에서의 각 outcome과 통계적으로 독립되어 있는 경우 0으로 평가해야 한다.</p>
+<ul>
+<li><p>일반적인 decision tree에서는 outcome과 통계적으로 독립된 분할가 tree를 개선시키지 못하므로 분할의 기준으로 사용해서는 안된다고 명시하고 있다.</p></li>
+<li><p>그러나 uplift modeling에서는 분포를 이전보다 더 유사하게 만들 수 있으며, 이는 음의 분할기준치를 갖는 것을 의미한다. 즉 독립적인 분할가 발생할 수 있는 최악의 분할가 아닐 수 있음을 의미한다.</p></li>
+</ul></li>
+<li><p>대조군의 크기가 0일 경우의 분할기준치는 decision tree가 사용하는 표준 분할기준치까지 감소시켜야한다.</p></li>
+</ol>
+<p><br></p>
+<p>이 보고서는 Uplift random forest와 함께 네 가지 서로 다른 분할기준을 다룬다. 각각은 <span class="math inline">\(P=(p_1,\cdots,p_n)\)</span>과 <span class="math inline">\(Q=(q_1,\cdots,q_n)\)</span>의 분포 사이의 divergece 값을 계산한다.</p>
+<ul>
+<li>Kullback-Leibler divergence :<br>
+<span class="math inline">\(KL(P:Q)=\sum_ip_ilog\cfrac{p_i}{q_i}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>squared Euclidean distance :</p>
+<p><span class="math inline">\(ED(P:Q)=\sum_i(p_i-q_i)^2\)</span></p></li>
+</ul>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(\chi^2\)</span>-divergence :<br>
+<span class="math inline">\(\chi^2(P:Q)=\sum_i\cfrac{(p_i-q_i)^2}{q_i}\)</span></li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>L1-norm divergence :</p>
+<p><span class="math inline">\(L1(P:Q)=\sum_i|p_i-q_i|\)</span></p></li>
+</ul>
+<p>(Kullback-Leibler divergence, squared Euclidean distance, <span class="math inline">\(\chi^2\)</span>-divergence는 Rzepakowski and Jaroszewicz (2012b)에 소개되었고, L1-norm divergence는 Guelman, Guill´en, and P´erez-Mar´ın (2015)에서 소개되었다.)</p>
+<p>Random forest 모델은 주어진 군에 속하는 구매의 조건부 확률을 반환한다. Uplift score은 이하와 같은 식으로 계산된다.</p>
+<p><span class="math inline">\(Uplift\space score = P(purchase|treatment\space group) - P(purchase|control\space group)\)</span></p>
+<p>Score가 높다는 것은 치료로 인한 구매가능성이 높다는 것을 가정하고 있으므로 score를 내림차순으로 분류해야 한다. score가 음수인것은 치료를 하지 않는 것이 그개인의 구매확률이 더 높다는 의미이다. uplift를 직접적으로 모델링 하는 것의 장점은 이진적인(binary) 목적변수와 연속적인(continuous) 목적변수 모두에 적용할 수 있다는 점이다.</p>
+</div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/Uplift-modeling/">Uplift modeling</a><a class="link-muted mr-2" rel="tag" href="/tags/Uplift-Tree/">Uplift Tree</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=5faeaef89fba030012a7dd31&amp;product=inline-share-buttons" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/jaysung00" target="_blank" rel="external nofollow noopener noreferrer" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2020/12/17/Selection/"><span class="level-item">【Uplift Modeling】변수의 선택방법에 대하여</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script>var disqus_config = function () {
+            this.page.url = 'https://jaysung00.github.io/2020/12/17/Uplift-tree/';
+            this.page.identifier = '2020/12/17/Uplift-tree/';
+        };
+        (function() {
+            var d = document, s = d.createElement('script');  
+            s.src = '//' + 'jays-hexo-blog' + '.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();</script></div></div></div><!--!--><div class="column column-right is-4-tablet is-4-desktop is-4-widescreen  order-3 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">1</span><span class="level-item">Real-World Uplift Modelling with Significance-Based Uplift Trees</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">1.1.1</span><span class="level-item">Section6.1 Tree-based Uplift Modeling</span></span></a></li></ul></ul></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2</span><span class="level-item">Modeling Uplift Directly: Uplift Decision Tree with KL Divergence and Euclidean Distance as Splitting Criteria</span></span></a><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.1</span><span class="level-item">- Uplift Decision Tree의 뒤에 있는 이론에 대해</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.2</span><span class="level-item">- 이 이론을 설명하기 위한 Example</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">2.1.3</span><span class="level-item">- 잠재적인 준(準)최적 분할 (Potential Suboptimal Splits)</span></span></a></li></ul></ul></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3</span><span class="level-item">Uplift Modeling: Identifying Optimal Treatment Group Allocation and Whom to Contact to Maximize Return on Investment</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">4.1.3 Model Uplift Directly</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3.1.1</span><span class="level-item">- General Tree-based Methods</span></span></a></li><li><a class="level is-mobile" href="#"><span class="level-left"><span class="level-item">3.1.2</span><span class="level-item">- Tree-based Methods for Estimating Uplift</span></span></a></li></ul></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time datetime="2020-12-17T01:53:17.000Z">2020-12-17</time></p><p class="title"><a href="/2020/12/17/Uplift-tree/">【Uplift Modeling】Uplift tree에 관한 논문 내용 번역</a></p><p class="categories"><a href="/categories/UPLIFT-MODELING/">UPLIFT MODELING</a> / <a href="/categories/UPLIFT-MODELING/c-Methods/">c.Methods</a> / <a href="/categories/UPLIFT-MODELING/c-Methods/2-Tree-based-Algorithm/">2.Tree-based Algorithm</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time datetime="2020-12-17T01:46:51.000Z">2020-12-17</time></p><p class="title"><a href="/2020/12/17/Selection/">【Uplift Modeling】변수의 선택방법에 대하여</a></p><p class="categories"><a href="/categories/UPLIFT-MODELING/">UPLIFT MODELING</a> / <a href="/categories/UPLIFT-MODELING/b-Feature-Selection/">b.Feature Selection</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time datetime="2020-12-17T01:40:48.000Z">2020-12-17</time></p><p class="title"><a href="/2020/12/17/UM-overview/">【Uplift Modeling】도입의 배경에 대해 생각해보자</a></p><p class="categories"><a href="/categories/UPLIFT-MODELING/">UPLIFT MODELING</a> / <a href="/categories/UPLIFT-MODELING/a-Overall/">a.Overall</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/12/04/CN2/"><img src="https://i.imgur.com/hHuRkYo.jpg" alt="【Causal Inference②】조작변수법(IV)에 관하여"></a></figure><div class="media-content"><p class="date"><time datetime="2020-12-04T08:34:44.000Z">2020-12-04</time></p><p class="title"><a href="/2020/12/04/CN2/">【Causal Inference②】조작변수법(IV)에 관하여</a></p><p class="categories"><a href="/categories/Prerequisite/">Prerequisite</a> / <a href="/categories/Prerequisite/Causal-Inference/">Causal Inference</a> / <a href="/categories/Prerequisite/Causal-Inference/a-Overall/">a.Overall</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2020/11/30/CI1/"><img src="https://i.imgur.com/hHuRkYo.jpg" alt="【Causal Inference①】인과추론의 목적과 RCT에 관하여"></a></figure><div class="media-content"><p class="date"><time datetime="2020-11-30T02:39:29.000Z">2020-11-30</time></p><p class="title"><a href="/2020/11/30/CI1/">【Causal Inference①】인과추론의 목적과 RCT에 관하여</a></p><p class="categories"><a href="/categories/Prerequisite/">Prerequisite</a> / <a href="/categories/Prerequisite/Causal-Inference/">Causal Inference</a> / <a href="/categories/Prerequisite/Causal-Inference/a-Overall/">a.Overall</a></p></div></article></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Prerequisite/"><span class="level-start"><span class="level-item">Prerequisite</span></span><span class="level-end"><span class="level-item tag">4</span></span></a><ul><li><a class="level is-mobile" href="/categories/Prerequisite/Causal-Inference/"><span class="level-start"><span class="level-item">Causal Inference</span></span><span class="level-end"><span class="level-item tag">4</span></span></a><ul><li><a class="level is-mobile" href="/categories/Prerequisite/Causal-Inference/a-Overall/"><span class="level-start"><span class="level-item">a.Overall</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/Prerequisite/Causal-Inference/b-Bayesian-Network/"><span class="level-start"><span class="level-item">b.Bayesian Network</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li></ul></li></ul></li><li><a class="level is-mobile" href="/categories/UPLIFT-MODELING/"><span class="level-start"><span class="level-item">UPLIFT MODELING</span></span><span class="level-end"><span class="level-item tag">3</span></span></a><ul><li><a class="level is-mobile" href="/categories/UPLIFT-MODELING/a-Overall/"><span class="level-start"><span class="level-item">a.Overall</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/UPLIFT-MODELING/b-Feature-Selection/"><span class="level-start"><span class="level-item">b.Feature Selection</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/UPLIFT-MODELING/c-Methods/"><span class="level-start"><span class="level-item">c.Methods</span></span><span class="level-end"><span class="level-item tag">1</span></span></a><ul><li><a class="level is-mobile" href="/categories/UPLIFT-MODELING/c-Methods/2-Tree-based-Algorithm/"><span class="level-start"><span class="level-item">2.Tree-based Algorithm</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></li></ul></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="https://i.imgur.com/fQTl3A4.png" alt="Jay Sung&#039;s DS blog" height="28"></a><p class="is-size-7"><span>&copy; 2020 Jay Sung</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="external nofollow noopener noreferrer">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="external nofollow noopener noreferrer" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'folded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>
