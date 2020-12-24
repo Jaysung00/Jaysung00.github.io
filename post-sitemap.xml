@@ -10,7 +10,15 @@
 
     <url>
         <loc>https://jaysung00.github.io/2020/12/17/Selection/</loc>
-        <lastmod>2020-12-18T08:08:26.042Z</lastmod>
+        <lastmod>2020-12-24T02:30:57.635Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jaysung00.github.io/2020/12/24/Evaluation/</loc>
+        <lastmod>2020-12-24T02:28:20.742Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
